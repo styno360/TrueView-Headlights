@@ -77,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
 /* =========================================
    SMOOTH SCROLL FOR ANCHOR LINKS
 ========================================= */
@@ -117,21 +116,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 /* =========================================
-   CONTACT FORM VALIDATION
+   CONTACT FORM VALIDATION (NETLIFY VERSION)
 ========================================= */
 const contactForm = document.getElementById("contactForm");
 
 if (contactForm) {
-  contactForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  contactForm.addEventListener("submit", (e) => {
+    let isValid = true;
 
     const name = document.getElementById("name");
     const email = document.getElementById("email");
     const phone = document.getElementById("phone");
     const vehicle = document.getElementById("vehicle");
     const message = document.getElementById("message");
-
-    let isValid = true;
 
     // Clear previous errors
     document.querySelectorAll(".error-message").forEach(el => el.remove());
@@ -153,28 +150,28 @@ if (contactForm) {
     if (vehicle.value.trim() === "") { showError(vehicle, "Please enter your vehicle."); isValid = false; }
     if (message.value.trim() === "") { showError(message, "Please enter a message."); isValid = false; }
 
-    if (!isValid) return;
-
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: name.value,
-        email: email.value,
-        phone: phone.value,
-        vehicle: vehicle.value,
-        message: message.value
-      })
-    });
-
-    if (response.ok) {
-      alert("Thank you for contacting TrueView Headlight Restoration. We will get back to you shortly.");
-      e.target.reset();
-    } else {
-      alert("There was an issue sending your message. Please try again.");
+    // Stop submission ONLY if invalid
+    if (!isValid) {
+      e.preventDefault();
     }
+
+    // If valid: DO NOT prevent default.
+    // Netlify will submit the form normally.
   });
 }
+
+
+/* =========================================
+   CONTACT FORM SCROLL
+========================================= */
+document.querySelectorAll('a[href^="#contactForm"]').forEach(anchor => {
+  anchor.addEventListener("click", function (e) {
+    e.preventDefault();
+    document.querySelector("#contactForm").scrollIntoView({
+      behavior: "smooth"
+    });
+  });
+});
 
 
 /* =========================================
@@ -220,19 +217,6 @@ document.querySelectorAll('.sold-card').forEach(card => {
 
 
 /* =========================================
-   CONTACT FORM SCROLL
-========================================= */
-document.querySelectorAll('a[href^="#contactForm"]').forEach(anchor => {
-  anchor.addEventListener("click", function (e) {
-    e.preventDefault();
-    document.querySelector("#contactForm").scrollIntoView({
-      behavior: "smooth"
-    });
-  });
-});
-
-
-/* =========================================
    READ MORE BUTTONS (INVENTORY CARDS)
 ========================================= */
 document.addEventListener("DOMContentLoaded", () => {
@@ -256,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
 /* =========================================
                     FAQ
 ========================================= */
@@ -264,11 +249,7 @@ document.querySelectorAll(".faq-question").forEach((button) => {
     const card = button.parentElement;
     const icon = button.querySelector(".faq-icon");
 
-    // Toggle open class
     card.classList.toggle("open");
-
-    // Switch icon
     icon.textContent = card.classList.contains("open") ? "−" : "+";
   });
 });
-
